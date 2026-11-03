@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(go build:*)",
+      "Bash(go vet:*)",
+      "Bash(go test:*)",
+      "Bash(go run ./cmd/go-02:*)",
+      "Bash(go mod tidy)",
+      "Bash(gofmt -l:*)",
+      "Bash(golangci-lint run:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)"
+    ],
+    "ask": [
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(go get:*)"
+    ],
+    "deny": [
+      "Bash(git push --force:*)",
+      "Bash(git push -f:*)",
+      "Bash(rm -rf:*)",
+      "Read(./.env)",
+      "Edit(./.env)",
+      "Write(./.env)"
+    ]
+  }
+}
