@@ -83,7 +83,7 @@ func (s *Store) ListVariants(ctx context.Context) ([]Variant, error) {
 	if err != nil {
 		return nil, fmt.Errorf("list variants: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	variants := []Variant{}
 	for rows.Next() {
@@ -147,7 +147,7 @@ func (s *Store) ListImages(ctx context.Context, variantID int64) ([]Image, error
 	if err != nil {
 		return nil, fmt.Errorf("list images: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	images := []Image{}
 	for rows.Next() {

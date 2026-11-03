@@ -1,68 +1,72 @@
-# Projekt: go-02
+# go-02
 
-Go-Projekt, spec-driven entwickelt mit dem Superpowers-Workflow (brainstorming → Spec → Plan → TDD-Umsetzung).
-
-## Stack
-
-- Sprache: Go (Version siehe `go.mod`), Modul `github.com/djw4u/go-02`
-- Abhängigkeiten über Go Modules; `go.mod` und `go.sum` sind eingecheckt
-- Tests: `go test` (Standardbibliothek, ggf. table-driven Tests)
+Lokale Web-App: JSON-Parameter -> SVG-Bilder, Ablage in SQLite.
+Details: `README.md`, `start-server.md`, `docs/superpowers/`.
 
 ## Befehle
 
-- Build: `go build ./...`
-- Tests: `go test ./...`
-- Einzelnes Paket / einzelner Test: `go test ./pfad/zum/paket -run TestName`
-- Race-Detector: `go test -race ./...`
-- Vet: `go vet ./...`
-- Format: `gofmt -w .` (Prüfung: `gofmt -l .` muss leer sein)
-- Lint: `golangci-lint run` (falls installiert und konfiguriert)
-- Abhängigkeiten laden: `go mod download`
-- Abhängigkeit hinzufügen: `go get <paket>`, danach `go mod tidy`
-- Einmalig ein Tool ausführen: `go run <paket>@<version>`
+- Start:  `go run ./cmd/go-02`
+- Flags:  `-db` (Default `go-02.db`), `-addr` (`127.0.0.1:8080`)
+- Build:  `go build ./...`
+- Test:   `go test ./...`
+- Einzel: `go test ./internal/web -run TestName`
+- Vet:    `go vet ./...`
+- Format: `gofmt -l .` (Ausgabe muss leer sein)
+- Lint:   `golangci-lint run` (Config: `.golangci.yml`)
+- Ohne cgo: `CGO_ENABLED=0 go build ./...` muss laufen
+- Vor Abschluss: Build, Vet, gofmt, Lint, Test grün.
 
-## Projektstruktur
+`golangci-lint` muss lokal installiert sein (derzeit nicht der Fall).
+Keine CI, kein Makefile.
 
-```
-cmd/<name>/   main-Pakete (dünn, nur Verdrahtung)
-internal/     Anwendungscode, nicht importierbar von außen
-docs/         Specs und Pläne (Superpowers-Workflow)
-```
+## Struktur
 
-Die Struktur wird mit dem Projekt wachsen; bei Abweichungen diese Datei anpassen.
+    cmd/go-02/           main: Flags, Verdrahtung, Shutdown
+    internal/generator/  Parameter -> SVG (kein HTTP, keine DB)
+    internal/store/      SQLite-Zugriff (modernc.org/sqlite)
+    internal/web/        Handler, Templates (go:embed), CSS
+    scripts/             import_params.sql (Import per sqlite3)
+    docs/superpowers/    Specs und Pläne
 
-## Code-Konventionen
+- `web` nutzt `generator` und `store`, nie umgekehrt.
+- `web` definiert sein eigenes kleines `Store`-Interface.
+- Erweitern: Anordnung in `layoutFor`, Figur in `drawFigure`,
+  Regel in `evalRule` (je ein neuer `case`).
 
-- Idiomatisches Go: Effective Go und Code Review Comments als Maßstab
-- Code ist `gofmt`-formatiert
-- Fehler nicht verschlucken: behandeln oder mit Kontext weiterreichen (`fmt.Errorf("...: %w", err)`); keine `panic` im Normalbetrieb
-- `context.Context` als erster Parameter bei blockierenden oder abbrechbaren Operationen
-- Kleine Interfaces, dort definiert, wo sie genutzt werden; Strukturen zurückgeben, Interfaces akzeptieren
-- Keine toten Code- oder Auskommentier-Reste, keine globalen veränderlichen Zustände
-- Exportierte Bezeichner haben Doc-Kommentare
-- Neue Abhängigkeiten nur, wenn nötig, und vorher kurz begründen; Standardbibliothek bevorzugen
+## Konventionen
+
+- Fehler mit Kontext: `fmt.Errorf("...: %w", err)`; kein `panic`.
+- Fehlertexte, Log-Meldungen, Bezeichner: englisch.
+- Kommentare, Doc-Kommentare, Nutzertexte (UI, HTTP): deutsch.
+- Feldfehler nennen das Feld: `field %q: want ..., got ...`.
+- Sentinel-Fehler: `store.ErrNotFound`, Prüfung per `errors.Is`.
+- Logging mit `log/slog`.
+- Zufall nur über `generator.Source`, nie global.
+- Server rendert HTML (`html/template`), kein JavaScript.
+- Tests: table-driven mit `t.Run`, Datei `*_test.go` daneben.
 
 ## Tests
 
-- Neue Funktionalität und Bugfixes bekommen einen Test
-- Bei einem Bugfix zuerst einen fehlschlagenden Test schreiben, dann beheben (TDD)
-- Tests müssen deterministisch sein (keine echten Netzwerkaufrufe, keine Abhängigkeit von Uhrzeit oder Reihenfolge); Zeit und I/O über Interfaces injizieren
-- Test-Dateien als `*_test.go` neben dem Code
+- Deterministisch: fester Seed, DB nur in `t.TempDir()`.
+- Web-Tests mit `httptest`, keine echten Netzwerkaufrufe.
+- `import_script_test.go` braucht `sqlite3` im `PATH`,
+  sonst wird der Test übersprungen (kein Fehler).
 
-## Arbeitsweise für den Agenten
+## Stolpersteine
 
-- Vor dem Abschluss grün haben: `go build ./...`, `go vet ./...`, `gofmt -l .` (leer), `go test ./...`
-- Änderungen klein halten, ein Thema pro Branch und Commit
-- Commit-Nachrichten im Imperativ, kurz und konkret (z. B. `Fix: Timeout im Retry-Handler`)
-- Specs und Pläne liegen unter `docs/`; Implementierung folgt dem freigegebenen Plan
-- Vor größeren Änderungen (neue Abhängigkeit, Umbau der Struktur, Änderung der Public API) erst einen kurzen Plan vorlegen
-- Bei Unklarheit nachfragen statt raten
-- Falls ein Paket nicht baut oder läuft (z. B. cgo, plattformspezifischer Code), nicht stillschweigend ausweichen, sondern das Problem melden
+- Kein generierter Code. Abhängigkeit: nur `modernc.org/sqlite`.
+- Keine Umgebungsvariablen; Konfiguration nur über Flags.
+- Eine DB-Verbindung (`SetMaxOpenConns(1)`) gegen `SQLITE_BUSY`.
+- `?` oder `#` im DB-Pfad bricht die Verbindung.
+- Default-DB `go-02.db` liegt im Arbeitsverzeichnis; `.gitignore`
+  ignoriert `*.db` nicht. Keine DB committen.
+- Parameterformat und Grenzen: `start-server.md`.
+- `.superpowers/` ist ignoriert (Brainstorming-Arbeitsdateien).
 
-## Tabus
+## Arbeitsweise
 
-- Keine Änderungen an `.env`, Secrets oder CI-Konfiguration ohne Rückfrage
-- Keine Secrets in Code, Logs oder Commits
-- Kein `git push --force`, kein `rm -rf` außerhalb von Build-Ordnern
-- `go.sum` nicht von Hand editieren
-- Nicht auf `main` committen, immer auf einem Feature-Branch arbeiten
+- Commit-Nachrichten: Imperativ, kurz und konkret, ohne Präfix.
+- Ein Thema je Commit.
+- Neue Abhängigkeit oder Umbau: erst kurz begründen.
+- Kein `git push --force`; `go.sum` nicht von Hand ändern.
+- Keine Änderung an `.env`, Secrets oder CI ohne Rückfrage.
