@@ -12,8 +12,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/djw4u/go-01/internal/generator"
-	"github.com/djw4u/go-01/internal/store"
+	"github.com/djw4u/go-02/internal/generator"
+	"github.com/djw4u/go-02/internal/store"
 )
 
 const gridParams = `{"params":{"structure":"GRID","rows":2,"columns":2,"figures":"circle","width":10}}`

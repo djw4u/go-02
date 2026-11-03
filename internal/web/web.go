@@ -15,8 +15,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/djw4u/go-01/internal/generator"
-	"github.com/djw4u/go-01/internal/store"
+	"github.com/djw4u/go-02/internal/generator"
+	"github.com/djw4u/go-02/internal/store"
 )
 
 //go:embed templates/*.html static/style.css

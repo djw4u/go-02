@@ -39,7 +39,7 @@ func TestImportScript(t *testing.T) {
 	}
 
 	ctx := context.Background()
-	dbPath := filepath.Join(dir, "go-01.db")
+	dbPath := filepath.Join(dir, "go-02.db")
 	s, err := Open(ctx, dbPath) // legt das Schema an
 	if err != nil {
 		t.Fatal(err)

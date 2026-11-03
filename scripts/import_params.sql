@@ -2,7 +2,7 @@
 --
 -- Voraussetzung: Die App wurde einmal gestartet, damit das Schema existiert.
 -- Aufruf im Verzeichnis, das den Ordner params/ enthält:
---   sqlite3 go-01.db < scripts/import_params.sql
+--   sqlite3 go-02.db < scripts/import_params.sql
 --
 -- Jede *.json-Datei mit gültigem JSON wird eine Variante. Bereits importierte
 -- Dateien (gleicher source_file) werden übersprungen, ungültiges JSON ebenso.

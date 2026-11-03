@@ -1,4 +1,4 @@
-module github.com/djw4u/go-01
+module github.com/djw4u/go-02
 
 go 1.27.3
 

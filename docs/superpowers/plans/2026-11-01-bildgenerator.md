@@ -4,7 +4,7 @@
 
 **Goal:** Lokale Web-App, die aus JSON-Parametern SVG-Bilder mit geometrischen Figuren erzeugt, Varianten und Bilder in SQLite speichert und gespeicherte Bilder im eigenen Fenster zeigt.
 
-**Architecture:** Server-gerenderte Seiten (`html/template`, `go:embed`). `internal/generator` (Parameter → SVG) ist unabhängig von HTTP und Datenbank, `internal/store` kapselt SQLite (`modernc.org/sqlite`), `internal/web` verdrahtet beides in Handlern, `cmd/go-01` startet den Server.
+**Architecture:** Server-gerenderte Seiten (`html/template`, `go:embed`). `internal/generator` (Parameter → SVG) ist unabhängig von HTTP und Datenbank, `internal/store` kapselt SQLite (`modernc.org/sqlite`), `internal/web` verdrahtet beides in Handlern, `cmd/go-02` startet den Server.
 
 **Tech Stack:** Go (Version laut `go.mod`), Standardbibliothek, `modernc.org/sqlite`, HTML/CSS ohne Frontend-Bibliotheken.
 
@@ -29,7 +29,7 @@
 - `palette` ist reine Metadaten und beeinflusst das Zeichnen nicht. `colorid` entfällt komplett (wird nicht gelesen, auch nicht in Beispielen).
 - `GRID`: feste Felder `rows`, `columns` (ganze Zahlen ≥ 1), Zellmittelpunkte zeilenweise über die Fläche 0..100; Anzahl = `rows*columns`, `nr_of_figures`, `x`, `y` werden ignoriert. `PDS`: feste Felder `nr_of_figures` und `min_distance` (> 0), Punkte in 0..100 per Dart-Throwing mit höchstens `100*nr_of_figures` Versuchen; findet es weniger Punkte, wird ohne Fehler die kleinere Zahl geliefert. `RANDOM`: `x`, `y` je Figur aus Regeln, Anzahl `nr_of_figures` (≥ 1).
 - Web: Vorschau als `<img src="data:image/svg+xml;base64,…">`; der Bildinhalt reist als verstecktes Formularfeld `svg` zum Speichern (Server prüft: beginnt mit `<svg `, höchstens 1 MiB). Fehler in der Oberfläche als Meldung über der Seite mit Status 422.
-- Standardwerte: Datenbankdatei `go-01.db`, Adresse `127.0.0.1:8080`, Flags `-db` und `-addr`.
+- Standardwerte: Datenbankdatei `go-02.db`, Adresse `127.0.0.1:8080`, Flags `-db` und `-addr`.
 
 ## Review Focus
 
@@ -155,7 +155,7 @@ func layoutFor(structure string) (layout, bool) // "RANDOM", "GRID", "PDS" per s
 ### Task 5: Import-Skript
 
 **Files:**
-- Create: `scripts/import_params.sql` (Statement aus dem Spec, Kopfkommentar: App muss einmal gestartet sein, damit das Schema existiert; Aufruf `sqlite3 go-01.db < scripts/import_params.sql` im Verzeichnis, das `params/` enthält)
+- Create: `scripts/import_params.sql` (Statement aus dem Spec, Kopfkommentar: App muss einmal gestartet sein, damit das Schema existiert; Aufruf `sqlite3 go-02.db < scripts/import_params.sql` im Verzeichnis, das `params/` enthält)
 - Test: `internal/store/import_script_test.go`
 
 **Interfaces:**
@@ -200,16 +200,16 @@ func New(s Store, newSource func() generator.Source) (http.Handler, error) // Te
 ### Task 7: Programmstart und README
 
 **Files:**
-- Create: `cmd/go-01/main.go`
+- Create: `cmd/go-02/main.go`
 - Modify: `README.md`
-- Test: `cmd/go-01/main_test.go`
+- Test: `cmd/go-02/main_test.go`
 
 **Interfaces:**
 - Consumes: `store.Open`, `web.New`, `generator.Source`.
 - Produces: `func run(ctx context.Context, args []string) error` – parst `-db` und `-addr`, öffnet den Store, startet den Server, fährt bei Abbruch des `ctx` per `Shutdown` geordnet herunter und gibt dann `nil` zurück. `main` ruft `run` mit `signal.NotifyContext(os.Interrupt)`. `newSource` liefert pro Aufruf `rand.New(rand.NewPCG(rand.Uint64(), rand.Uint64()))`.
 
 - [ ] **Step 1: Failing tests:** `TestRun_StartsAndStopsOnCancel` (`-addr 127.0.0.1:0`, `-db` in `t.TempDir()`, `ctx` nach kurzem Warten abbrechen → `run` gibt `nil` zurück); `TestRun_InvalidFlagFails`.
-- [ ] **Step 2:** `go test ./cmd/go-01/` → FAIL.
-- [ ] **Step 3:** `main.go` implementieren; README um Start (`go run ./cmd/go-01`), Flags und Import (`sqlite3 go-01.db < scripts/import_params.sql`) ergänzen.
+- [ ] **Step 2:** `go test ./cmd/go-02/` → FAIL.
+- [ ] **Step 3:** `main.go` implementieren; README um Start (`go run ./cmd/go-02`), Flags und Import (`sqlite3 go-02.db < scripts/import_params.sql`) ergänzen.
 - [ ] **Step 4:** Alle Prüfungen: `go build ./...`, `go vet ./...`, `gofmt -l .` (leer), `go test ./...`, `CGO_ENABLED=0 go build ./...`. Manuell: App starten, `curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8080/werkstatt` → `200`.
 - [ ] **Step 5:** Branch `feature/main`, Commit `Feature: Programmstart und README`, PR.

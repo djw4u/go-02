@@ -1,10 +1,10 @@
-# go-01: Parametergesteuerter SVG-Bildgenerator – Design
+# go-02: Parametergesteuerter SVG-Bildgenerator – Design
 
 Stand: 2026-11-01 · Status: Entwurf zur Freigabe
 
 ## Zweck
 
-go-01 ist ein Werkzeug, mit dem der Eigentümer SVG-Bilder erzeugt, die mit geometrischen Figuren (Quadrate, regelmässige Dreiecke, Rechtecke, Polygone, Kreise, Linien) gefüllt sind. Ein JSON-Parametersatz steuert die Erzeugung. Das Werkzeug läuft zunächst lokal als Web-App mit SQLite, wächst über die Zeit um Funktionen und soll im Endausbau als Web-App auch Dritten das Generieren erlauben.
+go-02 ist ein Werkzeug, mit dem der Eigentümer SVG-Bilder erzeugt, die mit geometrischen Figuren (Quadrate, regelmässige Dreiecke, Rechtecke, Polygone, Kreise, Linien) gefüllt sind. Ein JSON-Parametersatz steuert die Erzeugung. Das Werkzeug läuft zunächst lokal als Web-App mit SQLite, wächst über die Zeit um Funktionen und soll im Endausbau als Web-App auch Dritten das Generieren erlauben.
 
 ## Ziele
 
@@ -26,7 +26,7 @@ go-01 ist ein Werkzeug, mit dem der Eigentümer SVG-Bilder erzeugt, die mit geom
 
 ## Rahmenbedingungen
 
-- Go (Version laut `go.mod`), Modul `github.com/djw4u/go-01`, Standardbibliothek bevorzugt.
+- Go (Version laut `go.mod`), Modul `github.com/djw4u/go-02`, Standardbibliothek bevorzugt.
 - Frontend: HTML und CSS, ausgeliefert über `html/template` mit `go:embed`. Weitere Frontend-Bausteine (z. B. `htmx`, ein JSON-Editor) nur bei Bedarf und einzeln begründet.
 - Abhängigkeit SQLite: `modernc.org/sqlite` (reines Go, kein cgo). Entscheidung des Entwurfs-Autors, vom Eigentümer bestätigt. Alternative `mattn/go-sqlite3` (cgo) wurde verworfen.
 - Projektregeln aus `CLAUDE.md` gelten: TDD, deterministische Tests, `context.Context`, kleine Interfaces, keine globalen veränderlichen Zustände.
@@ -41,7 +41,7 @@ go-01 ist ein Werkzeug, mit dem der Eigentümer SVG-Bilder erzeugt, die mit geom
 ## Architektur
 
 ```
-cmd/go-01/            main: Verdrahtung, Konfiguration, Start des HTTP-Servers
+cmd/go-02/            main: Verdrahtung, Konfiguration, Start des HTTP-Servers
 internal/generator/   Parameter -> SVG; ohne HTTP und ohne Datenbank nutzbar
 internal/store/       SQLite-Zugriff (Varianten, Bilder)
 internal/web/         HTTP-Handler, Templates, statische Dateien
@@ -83,7 +83,7 @@ FROM fsdir('params')
 WHERE name LIKE '%.json' AND json_valid(CAST(data AS TEXT));
 ```
 
-Aufruf: `sqlite3 go-01.db < scripts/import_params.sql`. Ein erneuter Lauf überspringt bereits importierte Dateien (`source_file` ist eindeutig). Ungültiges JSON wird still übersprungen. Auf dem Entwicklungsrechner geprüft: `sqlite3` 3.54.0, `fsdir()` und `json_valid()` verfügbar. Die App selbst kennt weder JSON-Dateien noch den Import-Ordner.
+Aufruf: `sqlite3 go-02.db < scripts/import_params.sql`. Ein erneuter Lauf überspringt bereits importierte Dateien (`source_file` ist eindeutig). Ungültiges JSON wird still übersprungen. Auf dem Entwicklungsrechner geprüft: `sqlite3` 3.54.0, `fsdir()` und `json_valid()` verfügbar. Die App selbst kennt weder JSON-Dateien noch den Import-Ordner.
 
 ## Parameterformat
 
@@ -135,7 +135,7 @@ Umsetzung mit HTML und CSS; Frontend-Bausteine nur bei Bedarf.
 
 ## Entscheidungen des Autors (nicht im Gespräch bestätigt)
 
-- Aufbau der Pakete wie oben (`cmd/go-01`, `internal/generator|store|web`).
+- Aufbau der Pakete wie oben (`cmd/go-02`, `internal/generator|store|web`).
 - Tabellenspalte `parent_id` und `created_at`.
 - Schema-Anlage beim App-Start.
 - Die Spalte `params` speichert die komplette JSON-Datei inklusive des äußeren Schlüssels `"params"`; der Generator liest daraus den Inhalt von `params`.

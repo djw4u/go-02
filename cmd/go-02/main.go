@@ -1,4 +1,4 @@
-// Command go-01 startet die lokale Web-App zum Erzeugen von SVG-Bildern.
+// Command go-02 startet die lokale Web-App zum Erzeugen von SVG-Bildern.
 package main
 
 import (
@@ -14,9 +14,9 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/djw4u/go-01/internal/generator"
-	"github.com/djw4u/go-01/internal/store"
-	"github.com/djw4u/go-01/internal/web"
+	"github.com/djw4u/go-02/internal/generator"
+	"github.com/djw4u/go-02/internal/store"
+	"github.com/djw4u/go-02/internal/web"
 )
 
 func main() {
@@ -24,7 +24,7 @@ func main() {
 	err := run(ctx, os.Args[1:])
 	stop()
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "go-01:", err)
+		fmt.Fprintln(os.Stderr, "go-02:", err)
 		os.Exit(1)
 	}
 }
@@ -32,9 +32,9 @@ func main() {
 // run startet den Server und kehrt nach einem Abbruch von ctx mit nil zurück,
 // sobald der Server geordnet heruntergefahren ist.
 func run(ctx context.Context, args []string) error {
-	fs := flag.NewFlagSet("go-01", flag.ContinueOnError)
+	fs := flag.NewFlagSet("go-02", flag.ContinueOnError)
 	fs.SetOutput(io.Discard)
-	dbPath := fs.String("db", "go-01.db", "Pfad der SQLite-Datenbank")
+	dbPath := fs.String("db", "go-02.db", "Pfad der SQLite-Datenbank")
 	addr := fs.String("addr", "127.0.0.1:8080", "Adresse des HTTP-Servers")
 	if err := fs.Parse(args); err != nil {
 		return fmt.Errorf("parse flags: %w", err)

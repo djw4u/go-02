@@ -1,10 +1,10 @@
-# Projekt: go-01
+# Projekt: go-02
 
 Go-Projekt, spec-driven entwickelt mit dem Superpowers-Workflow (brainstorming → Spec → Plan → TDD-Umsetzung).
 
 ## Stack
 
-- Sprache: Go (Version siehe `go.mod`), Modul `github.com/djw4u/go-01`
+- Sprache: Go (Version siehe `go.mod`), Modul `github.com/djw4u/go-02`
 - Abhängigkeiten über Go Modules; `go.mod` und `go.sum` sind eingecheckt
 - Tests: `go test` (Standardbibliothek, ggf. table-driven Tests)
 

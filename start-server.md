@@ -1,14 +1,14 @@
-# go-01: Server starten und weiterentwickeln
+# go-02: Server starten und weiterentwickeln
 
 Lokale Web-App, die aus JSON-Parametern SVG-Bilder mit geometrischen Figuren erzeugt. Varianten und gespeicherte Bilder liegen in SQLite. Die App läuft auf <http://127.0.0.1:8080>.
 
 ## Starten
 
-Datenbank und Parameterdateien liegen bewusst außerhalb des Projekts (`~/go-01-daten/`), damit nichts versehentlich ins Repo gerät. Die `.gitignore` ignoriert `*.db` nicht.
+Datenbank und Parameterdateien liegen bewusst außerhalb des Projekts (`~/go-02-daten/`), damit nichts versehentlich ins Repo gerät. Die `.gitignore` ignoriert `*.db` nicht.
 
 ```bash
-cd ~/code/go-01
-go run ./cmd/go-01 -db ~/go-01-daten/go-01.db
+cd ~/code/go-02
+go run ./cmd/go-02 -db ~/go-02-daten/go-02.db
 ```
 
 Die Datenbank und ihr Schema legt die App beim ersten Start selbst an. Beenden mit `Ctrl+C` (geordnetes Herunterfahren).
@@ -16,30 +16,30 @@ Die Datenbank und ihr Schema legt die App beim ersten Start selbst an. Beenden m
 Schnellerer Start ohne Übersetzen bei jedem Aufruf:
 
 ```bash
-cd ~/code/go-01
-go build -o ~/go-01-daten/go-01 ./cmd/go-01
-~/go-01-daten/go-01 -db ~/go-01-daten/go-01.db
+cd ~/code/go-02
+go build -o ~/go-02-daten/go-02 ./cmd/go-02
+~/go-02-daten/go-02 -db ~/go-02-daten/go-02.db
 ```
 
 | Flag    | Standard         | Bedeutung                 |
 |---------|------------------|---------------------------|
-| `-db`   | `go-01.db`       | Pfad der SQLite-Datenbank |
+| `-db`   | `go-02.db`       | Pfad der SQLite-Datenbank |
 | `-addr` | `127.0.0.1:8080` | Adresse des HTTP-Servers  |
 
 Ist der Port belegt, mit `-addr 127.0.0.1:8081` einen anderen wählen.
 
 ## Parameter importieren
 
-Der Import ist **keine App-Funktion**, sondern ein SQL-Skript. Die App muss einmal gestartet worden sein (Schema). Die JSON-Dateien liegen in `~/go-01-daten/params/`:
+Der Import ist **keine App-Funktion**, sondern ein SQL-Skript. Die App muss einmal gestartet worden sein (Schema). Die JSON-Dateien liegen in `~/go-02-daten/params/`:
 
 ```bash
-cd ~/go-01-daten
-sqlite3 go-01.db < ~/code/go-01/scripts/import_params.sql
+cd ~/go-02-daten
+sqlite3 go-02.db < ~/code/go-02/scripts/import_params.sql
 ```
 
 Bereits importierte Dateien (gleicher Pfad in `source_file`) und ungültiges JSON werden übersprungen. Danach die Seite neu laden.
 
-Beispieldateien in `~/go-01-daten/params/`: `beispiel.json` (RANDOM, 32 Figuren), `raster.json` (GRID 6×6), `poisson.json` (PDS). `raster` und `poisson` habe ich selbst geschrieben, `beispiel` stammt aus einer älteren Variante.
+Beispieldateien in `~/go-02-daten/params/`: `beispiel.json` (RANDOM, 32 Figuren), `raster.json` (GRID 6×6), `poisson.json` (PDS). `raster` und `poisson` habe ich selbst geschrieben, `beispiel` stammt aus einer älteren Variante.
 
 ## Bedienung
 
@@ -57,7 +57,7 @@ Die erste Version ist fertig und in `main` (PRs #3 bis #6, Stand `f71ace1`). Ent
 ## Aufbau
 
 ```
-cmd/go-01/            main: Flags, Verdrahtung, Server mit Timeouts, geordnetes Herunterfahren
+cmd/go-02/            main: Flags, Verdrahtung, Server mit Timeouts, geordnetes Herunterfahren
 internal/generator/   Parameter -> SVG (ohne HTTP, ohne Datenbank)
 internal/store/       SQLite-Zugriff (modernc.org/sqlite, ohne cgo)
 internal/web/         Handler, Templates (go:embed), static/style.css
@@ -131,7 +131,7 @@ Datei: `{"params": { ... }}`. Die Datenbank speichert die komplette Datei inklus
 ## Sitzung starten
 
 ```bash
-cd ~/code/go-01
+cd ~/code/go-02
 claude
 ```
 
