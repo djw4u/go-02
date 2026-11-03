@@ -1,0 +1,48 @@
+{{define "content"}}
+<h1>Werkstatt</h1>
+{{if not .Variants}}
+<p class="hint">Es gibt noch keine Varianten. Parameterdateien lassen sich außerhalb der App importieren:
+  <code>sqlite3 go-01.db &lt; scripts/import_params.sql</code> (siehe README).</p>
+{{else}}
+<div class="workbench">
+  <aside>
+    <h2>Varianten</h2>
+    <ul class="variants">
+      {{range .Variants}}
+      <li><a href="/werkstatt?variant={{.ID}}"{{if and $.Selected (eq .ID $.Selected.ID)}} class="active"{{end}}>{{.Name}}</a></li>
+      {{end}}
+    </ul>
+  </aside>
+
+  <section>
+    <h2>Parameter</h2>
+    {{with .Selected}}
+    <form method="post">
+      <input type="hidden" name="variant_id" value="{{.ID}}">
+      <label for="params">Parameter (JSON)</label>
+      <textarea id="params" name="params" rows="18" spellcheck="false">{{$.Params}}</textarea>
+      <div class="actions">
+        <button type="submit" formaction="/werkstatt/generate">Generieren</button>
+        <label>Name <input type="text" name="name" value="{{$.Name}}"></label>
+        <button type="submit" formaction="/werkstatt/save-variant">Neue Variante</button>
+      </div>
+    </form>
+    {{end}}
+  </section>
+
+  <section class="preview">
+    <h2>Vorschau</h2>
+    {{if .Preview}}
+    <img src="{{.Preview}}" alt="Vorschau des erzeugten Bildes">
+    <form method="post" action="/werkstatt/save-image">
+      <input type="hidden" name="variant_id" value="{{.Selected.ID}}">
+      <input type="hidden" name="svg" value="{{.SVG}}">
+      <button type="submit">SVG speichern</button>
+    </form>
+    {{else}}
+    <p class="hint">Noch nichts generiert. Die Vorschau wird erst mit „SVG speichern“ gespeichert.</p>
+    {{end}}
+  </section>
+</div>
+{{end}}
+{{end}}

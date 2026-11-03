@@ -1,0 +1,23 @@
+{{define "content"}}
+<h1>Galerie</h1>
+<p class="filter">Filter:
+  <a href="/galerie"{{if eq .FilterID 0}} class="active"{{end}}>Alle</a>
+  {{range .Variants}}
+  <a href="/galerie?variant={{.ID}}"{{if eq .ID $.FilterID}} class="active"{{end}}>{{.Name}}</a>
+  {{end}}
+</p>
+{{if .Images}}
+<ul class="grid">
+  {{range .Images}}
+  <li>
+    <a href="/bilder/{{.ID}}.svg" target="_blank" rel="noopener">
+      <img src="/bilder/{{.ID}}.svg" alt="Bild {{.ID}}">
+      <span>{{.VariantName}} · {{.Created}}</span>
+    </a>
+  </li>
+  {{end}}
+</ul>
+{{else}}
+<p class="hint">Keine gespeicherten Bilder.</p>
+{{end}}
+{{end}}
