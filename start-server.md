@@ -4,11 +4,11 @@ Lokale Web-App, die aus JSON-Parametern SVG-Bilder mit geometrischen Figuren erz
 
 ## Starten
 
-Datenbank und Parameterdateien liegen bewusst außerhalb des Projekts (`~/go-02-daten/`), damit nichts versehentlich ins Repo gerät. Die `.gitignore` ignoriert `*.db` nicht.
+Die Datenbank liegt standardmäßig als `go-02.db` im Arbeitsverzeichnis, also im Projektordner. Die `.gitignore` ignoriert `*.db` nicht: die Datei nicht committen.
 
 ```bash
 cd ~/code/go-02
-go run ./cmd/go-02 -db ~/go-02-daten/go-02.db
+go run ./cmd/go-02
 ```
 
 Die Datenbank und ihr Schema legt die App beim ersten Start selbst an. Beenden mit `Ctrl+C` (geordnetes Herunterfahren).
@@ -17,8 +17,8 @@ Schnellerer Start ohne Übersetzen bei jedem Aufruf:
 
 ```bash
 cd ~/code/go-02
-go build -o ~/go-02-daten/go-02 ./cmd/go-02
-~/go-02-daten/go-02 -db ~/go-02-daten/go-02.db
+go build -o bin/go-02 ./cmd/go-02
+./bin/go-02
 ```
 
 | Flag    | Standard         | Bedeutung                 |
@@ -34,7 +34,7 @@ Der Import ist **keine App-Funktion**, sondern ein SQL-Skript. Die App muss einm
 
 ```bash
 cd ~/go-02-daten
-sqlite3 go-02.db < ~/code/go-02/scripts/import_params.sql
+sqlite3 ~/code/go-02/go-02.db < ~/code/go-02/scripts/import_params.sql
 ```
 
 Bereits importierte Dateien (gleicher Pfad in `source_file`) und ungültiges JSON werden übersprungen. Danach die Seite neu laden.
@@ -148,9 +148,9 @@ Das Projekt wird spec-driven mit dem Superpowers-Workflow entwickelt:
 
 Regeln aus `CLAUDE.md`, die Claude beachtet:
 
-- Nie auf `main` committen, immer auf einem Feature-Branch, ein Thema pro Branch und Commit.
-- Commit-Nachrichten im Imperativ, kurz und konkret, mit Präfix wie `Feature:`, `Fix:`, `Docs:`, `Chore:`.
-- Vor dem Abschluss grün: `go build ./...`, `go vet ./...`, `gofmt -l .` (leer), `go test ./...`.
+- Ein Thema pro Commit.
+- Commit-Nachrichten im Imperativ, kurz und konkret, ohne Präfix.
+- Vor dem Abschluss grün: `go build ./...`, `go vet ./...`, `gofmt -l .` (leer), `golangci-lint run`, `go test ./...`.
 - Neue Abhängigkeiten nur nach kurzer Begründung. Vor größeren Änderungen (Struktur, Public API) erst ein Plan.
 - Keine Änderungen an `.env`, Secrets oder CI ohne Rückfrage; kein `git push --force`.
 - Tests sind deterministisch: Zufall und Zeit werden injiziert, keine echten Netzwerkaufrufe, Datenbanken nur in `t.TempDir()`.
