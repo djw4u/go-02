@@ -35,12 +35,11 @@ Keine CI, kein Makefile.
 
 ## Konventionen
 
-- Fehler mit Kontext: `fmt.Errorf("...: %w", err)`; kein `panic`.
+- Fehler mit Kontext: `fmt.Errorf("...: %w", err)`.
 - Fehlertexte, Log-Meldungen, Bezeichner: englisch.
 - Kommentare, Doc-Kommentare, Nutzertexte (UI, HTTP): deutsch.
 - Feldfehler nennen das Feld: `field %q: want ..., got ...`.
 - Sentinel-Fehler: `store.ErrNotFound`, Prüfung per `errors.Is`.
-- Logging mit `log/slog`.
 - Zufall nur über `generator.Source`, nie global.
 - Server rendert HTML (`html/template`), kein JavaScript.
 - Tests: table-driven mit `t.Run`, Datei `*_test.go` daneben.
@@ -62,9 +61,14 @@ Keine CI, kein Makefile.
   ignoriert `*.db` nicht. Keine DB committen.
 - Parameterformat und Grenzen: `start-server.md`.
 - `.superpowers/` ist ignoriert (Brainstorming-Arbeitsdateien).
+- Gespeicherte SVGs sind fremder Inhalt. CSP, `nosniff` und
+  `<img>` mit `data:`-URI nicht abschwächen.
+- `.golangci.yml` nicht lockern; `//nolint` nur mit Begründung.
 
 ## Arbeitsweise
 
+- Neue Funktion: Brainstorming -> Spec (`docs/superpowers/specs/`)
+  -> Plan (`docs/superpowers/plans/`) -> TDD, erst ein Test.
 - Commit-Nachrichten: Imperativ, kurz und konkret, ohne Präfix.
 - Ein Thema je Commit.
 - Neue Abhängigkeit oder Umbau: erst kurz begründen.
